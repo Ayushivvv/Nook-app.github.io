@@ -522,19 +522,20 @@
 
   /* Place-photo placeholders: always show a correct, place-relevant icon (never a random unrelated photo) */
   .thumb, .list-thumb{display:flex;align-items:center;justify-content:center;}
-  .cat-cafe::after{content:"☕";}
+  /* .cat-cafe::after{content:"☕";} */
   .cat-park::after{content:"🌳";}
-  .cat-library::after{content:"📚";}
-  .cat-building::after{content:"🏛️";}
+  /* .cat-library::after{content:"📚";} */
+  /* .cat-building::after{content:"";width:165px;height:90px;background-image:url("images/student-com1.jpeg");background-size:cover;background-position:center;display:block;} */
   .cat-tech::after{content:"⚙️";}
-  .cat-city::after{content:"🗺️";}
+  /* .cat-city::after{content:"🗺️";} */
   .cat-generic::after{content:"📍";}
   .cat-cafe{background:linear-gradient(135deg,#E0AA5A,#8B5E34);}
   .cat-park{background:linear-gradient(135deg,#9CC178,#4F6B3A);}
   .cat-library{background:linear-gradient(135deg,#A88A63,#5A4632);}
-  .cat-building{background:linear-gradient(135deg,#AAB8C2,#5C6B7A);}
+  .cat-building{content:"";width:165px;height:90px;background-image:url("images/student-com1.jpeg");background-size:cover;background-position:center;display:block;}
+  /* .cat-building{background:linear-gradient(135deg,#AAB8C2,#5C6B7A);} */
   .cat-tech{background:linear-gradient(135deg,#7C8DA3,#3A4552);}
-  .cat-city{background:linear-gradient(135deg,#C2B396,#7A6B52);}
+  .cat-city{content:"";width:165px;height:90px;background-image:url("images/berlin.jpg");background-size:cover;background-position:center;display:block;}
   .cat-generic{background:linear-gradient(135deg,#C9C4AE,#9EA98A);}
   .thumb::after, .list-thumb::after{font-size:22px;opacity:0.9;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.25));}
   .photo::after{font-size:30px;opacity:0.9;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.25));}
@@ -623,7 +624,7 @@
   .match-pill{background:var(--tan);color:var(--tan-text);font-size:11px;font-weight:700;padding:6px 10px;border-radius:14px;}
 
   .list-row{display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;}
-  .list-thumb{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#C9C4AE,#9EA98A);flex-shrink:0;}
+  .list-thumb{width:44px;height:44px;border-radius:8px;background-image:url("images/list-thumb.jpeg");background-size:cover;background-position:center;flex-shrink:0;}
   .list-thumb.empty{background:var(--line);}
   .list-name{font-weight:700;font-size:13px;}
   .list-count{font-size:11px;color:var(--sub);}
@@ -1113,7 +1114,7 @@
     <div class="content">
       <div class="topbar"><div><div class="brand-tag"></div><h1 class="pagetitle">Profile</h1></div><span class="kebab" onclick="go('screen-settings')"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span></div>
       <div class="profile-head">
-        <div class="avatar-big" style="background-image:url('https://placekitten.com/300/300');"></div>
+        <div class="avatar-big" style="background-image:url('images/profile-pic.jpeg');"></div>
         <div>
           <div class="profile-name">Kevin</div>
           <div class="profile-handle">@kevinlovescat</div>
