@@ -165,8 +165,8 @@
   .scope-dropdown-menu.open{display:block;}
   .scope-dropdown-menu div{padding:12px 16px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;}
   .scope-dropdown-menu div:hover{background:var(--tan);}
-  .type-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-  .type-row .lbl{font-size:16px;font-weight:800;color:var(--ink);}
+  .type-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+  .type-row .lbl{font-size:16px;font-weight:800;color:var(--ink);min-width:110px;flex-shrink:0;}
   .type-select{background:var(--tan);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;color:var(--tan-text);display:flex;align-items:center;gap:8px;cursor:pointer;}
   .filter-section{border-top:1px solid var(--line);}
   .filter-row{
@@ -178,7 +178,8 @@
   .filter-row.open .chev{transform:rotate(180deg);}
   .filter-body{display:none; padding:16px 4px 20px;}
   .filter-body.open{display:block;}
-  .cost-track{position:relative;height:5px;background:var(--olive);border-radius:4px;margin:20px 6px 8px;}
+  .cost-track{position:relative;height:5px;background:var(--line);border-radius:4px;margin:20px 6px 8px;}
+  .cost-track-fill{position:absolute;top:0;height:100%;background:var(--olive);border-radius:4px;z-index:1;}
   .cost-handle{
     position:absolute; top:50%; transform:translate(-50%,-50%);
     width:24px;height:24px;border-radius:50%;background:var(--olive);
@@ -346,8 +347,14 @@
     box-shadow:0 2px 4px rgba(0,0,0,0.3);
     cursor:pointer;
     z-index:10;
+    transition:background .3s ease, border .3s ease;
   }
   .pin.green{background:var(--olive);}
+  .pin.pin-pending-white{
+    background:#fff;
+    border:3px solid var(--maroon);
+    box-sizing:border-box;
+  }
 
   .startquest{
     position:absolute;
@@ -386,10 +393,11 @@
   }
   .leaflet-control-attribution{font-size:8px !important;opacity:0.6;}
   .pin-icon{
-    position:absolute; top:2px; left:2px; width:18px; height:18px;
+    position:absolute; top:2px; left:0px; width:18px; height:18px;
     display:flex; align-items:center; justify-content:center;
     transform:rotate(45deg); font-size:11px;
   }
+  .pin.pin-pending-white .pin-icon{ left:-1px; }
   .you-are-here{
     position:absolute; width:34px; height:34px; z-index:11;
     display:flex; align-items:center; justify-content:center;
@@ -617,8 +625,10 @@
   .list-name{font-weight:700;font-size:13px;}
   .list-count{font-size:11px;color:var(--sub);}
 
-  .badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px;}
+  .badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 14px;margin-top:8px;}
   .badge{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto;}
+  .badge-item{text-align:center;}
+  .badge-name{font-size:11px;font-weight:700;color:var(--ink);margin-top:6px;line-height:1.2;}
 
   .input-field{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:12px;font-size:14px;margin-bottom:14px;outline:none;font-family:inherit;}
   .field-label{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px;}
@@ -642,6 +652,21 @@
   .fullmodal.active{display:flex;}
 
   /* quests */
+  .quest-tutorial-card{
+    position:relative;
+    background:linear-gradient(135deg, #F1F5EA, #EFE3C8);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-bottom:16px;
+  }
+  .quest-tutorial-close{
+    position:absolute; top:10px; right:12px;
+    font-size:14px; color:var(--sub); cursor:pointer; font-weight:800;
+  }
+  .quest-tutorial-icon{font-size:24px;margin-bottom:6px;}
+  .quest-tutorial-title{font-weight:800;font-size:15px;color:var(--ink);margin-bottom:4px;}
+  .quest-tutorial-text{font-size:12px;color:var(--sub);line-height:1.5;padding-right:16px;}
   .quest-card{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s;}
   .quest-card.selected{border-color:var(--olive-dark);background:#F1F5EA;}
   .quest-card .qinfo{flex:1;}
@@ -737,14 +762,14 @@
           <div class="chip">Accessibility <span class="x" onclick="this.parentElement.remove()">✕</span></div>
         </div>
       </div>
-      <div class="pin" style="top:33%;left:30%;" onclick="handlePinClick('Robarts Library','130 St George St','library')"><span class="pin-icon">📖</span></div>
-      <div class="pin" style="top:50%;left:58%;" onclick="handlePinClick('Gerstein Science Information Centre','9 King\'s College Cir','library,building')"><span class="pin-icon">📖</span></div>
+      <div class="pin" id="pin-robarts" data-name="Robarts Library" style="top:33%;left:30%;" onclick="handlePinClick('Robarts Library','130 St George St','library','robarts')"><span class="pin-icon">📖</span></div>
+      <div class="pin" id="pin-gerstein" data-name="Gerstein Science Information Centre" style="top:50%;left:58%;" onclick="handlePinClick('Gerstein Science Information Centre','9 King\'s College Cir','library,building','gerstein')"><span class="pin-icon">📖</span></div>
       <div class="you-are-here" style="top:44%;left:68%;">
         <div class="you-are-here-beam"></div>
         <div class="you-are-here-pulse"></div>
         <div class="you-are-here-figure">🧍</div>
       </div>
-      <div class="pin" style="top:68%;left:24%;" onclick="handlePinClick('Student Commons','230 College St','building')"><span class="pin-icon">🏛️</span></div>
+      <div class="pin" id="pin-student-commons" data-name="Student Commons" style="top:68%;left:24%;" onclick="handlePinClick('Student Commons','230 College St','building','student-commons')"><span class="pin-icon">🏛️</span></div>
 
       <div class="startquest" id="map-beginquest-btn" onclick="go('screen-begin-quest-picker')">Begin a Quest ⭐</div>
 
@@ -783,22 +808,22 @@
         <div class="chip">Accessibility <span class="x" onclick="this.parentElement.remove()">✕</span></div>
       </div>
 
-      <div class="place-card" onclick="go('screen-location')">
+      <div class="place-card" onclick="openLocationScreen('bahen')">
         <div class="row"><div class="name">Bahen Centre for Information Technology</div><div class="bookmark" onclick="event.stopPropagation();openAddToList(this)"><svg viewBox="0 0 24 24"><path d="M6 3.75h12a.75.75 0 01.75.75v16.5l-6.75-4-6.75 4V4.5a.75.75 0 01.75-.75z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div></div>
         <div class="addr">40 St George St, Toronto, ON M5S 2E4</div>
         <div class="open-badge">Open Till 9PM</div>
       </div>
-      <div class="place-card" onclick="go('screen-location')">
+      <div class="place-card" onclick="openLocationScreen('university-college')">
         <div class="row"><div class="name">University College (Main Building)</div><div class="bookmark" onclick="event.stopPropagation();openAddToList(this)"><svg viewBox="0 0 24 24"><path d="M6 3.75h12a.75.75 0 01.75.75v16.5l-6.75-4-6.75 4V4.5a.75.75 0 01.75-.75z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div></div>
         <div class="addr">15 King's College Cir, Toronto, ON M5S 3H7</div>
         <div style="color:var(--maroon);font-weight:700;font-size:12px;">Closed Till 9AM Tue</div>
       </div>
-      <div class="place-card" onclick="go('screen-location')">
+      <div class="place-card" onclick="openLocationScreen('robarts')">
         <div class="row"><div class="name">John P. Robarts Research Library (Robarts Library)</div><div class="bookmark" onclick="event.stopPropagation();openAddToList(this)"><svg viewBox="0 0 24 24"><path d="M6 3.75h12a.75.75 0 01.75.75v16.5l-6.75-4-6.75 4V4.5a.75.75 0 01.75-.75z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div></div>
         <div class="addr">130 St George St, Toronto, ON M5S 0C2</div>
         <div class="open-badge">Open Till 10PM</div>
       </div>
-      <div class="place-card" onclick="go('screen-location')">
+      <div class="place-card" onclick="openLocationScreen('pratt')">
         <div class="row"><div class="name">E.J. Pratt Library</div><div class="bookmark" onclick="event.stopPropagation();openAddToList(this)"><svg viewBox="0 0 24 24"><path d="M6 3.75h12a.75.75 0 01.75.75v16.5l-6.75-4-6.75 4V4.5a.75.75 0 01.75-.75z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div></div>
         <div class="addr">71 Queen's Park Cres E, Toronto, ON M5S 1K7</div>
         <div style="color:var(--maroon);font-weight:700;font-size:12px;">Closed Till 9AM Tue</div>
@@ -818,21 +843,21 @@
     <div class="content">
       <div class="topbar"><span class="backbtn" onclick="back()">‹</span></div>
       <div class="loc-header">
-        <div class="loc-title">📍 Bahen Centre for Information Technology</div>
+        <div class="loc-title">📍 <span id="loc-title-text">Bahen Centre for Information Technology</span></div>
         <div class="loc-icons"><span class="bookmark" onclick="openAddToList(this)"><svg viewBox="0 0 24 24"><path d="M6 3.75h12a.75.75 0 01.75.75v16.5l-6.75-4-6.75 4V4.5a.75.75 0 01.75-.75z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span></div>
       </div>
-      <div class="chips">
+      <div class="chips" id="loc-chips">
         <div class="chip">Study Spot</div>
         <div class="chip">Accessibility</div>
       </div>
-      <div style="font-size:13px;color:var(--ink);">40 St George St, Toronto, ON M5S 2E4</div>
-      <div style="font-size:12px;color:var(--sub);">Academic Department</div>
-      <a href="https://www.google.com/maps/search/?api=1&query=Bahen+Centre+for+Information+Technology+40+St+George+St+Toronto" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:700;color:var(--olive-dark);text-decoration:none;">
+      <div style="font-size:13px;color:var(--ink);" id="loc-address">40 St George St, Toronto, ON M5S 2E4</div>
+      <div style="font-size:12px;color:var(--sub);" id="loc-category">Academic Department</div>
+      <a href="https://www.google.com/maps/search/?api=1&query=Bahen+Centre+for+Information+Technology+40+St+George+St+Toronto" target="_blank" rel="noopener" id="loc-maps-link" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:700;color:var(--olive-dark);text-decoration:none;">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Open in Google Maps
       </a>
       <div class="section-label">Hours</div>
-      <div class="hours-table">
+      <div class="hours-table" id="loc-hours-block">
         <div class="open-badge">OPEN</div>
         <div class="today">Monday - Friday &nbsp; 8:30AM - 9PM</div>
         <div class="closed">Saturday: Closed</div>
@@ -844,7 +869,7 @@
         <div class="review-card"><div class="who"><img class="mini-avatar" src="https://randomuser.me/api/portraits/men/32.jpg"> Alex</div>"My favorite window looks out onto..."</div>
       </div>
       <div class="section-label">Photos</div>
-      <div class="photo-grid">
+      <div class="photo-grid" id="loc-photo-grid">
         <div class="photo cat-building"></div>
         <div class="photo cat-library"></div>
         <div class="photo cat-building"></div>
@@ -904,16 +929,16 @@
       <div class="topbar">
         <div><div class="brand-tag">Nook</div><h1 class="pagetitle">Social</h1></div>
         <div style="display:flex;gap:14px;font-size:18px;color:var(--ink);">
-          <span onclick="go('screen-manage-friends')" style="cursor:pointer">👥</span>
-          <span onclick="go('screen-chats')" style="cursor:pointer">💬</span>
-          <span onclick="go('screen-create-post')" style="cursor:pointer">➕</span>
+          <span onclick="go('screen-manage-friends')">👥</span>
+          <span onclick="go('screen-chats')">💬</span>
+          <span onclick="go('screen-create-post')">➕</span>
         </div>
       </div>
 
       <div class="post-card">
         <div class="post-head">
-          <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/65.jpg');cursor:pointer;" onclick="go('screen-profile-friend')"></div>
-          <div><div class="post-name" style="cursor:pointer;" onclick="go('screen-profile-friend')">Mary Jane <span class="post-meta">30 min ago</span></div>
+          <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/65.jpg');cursor:pointer;" onclick="openFriendProfile('mary-jane')"></div>
+          <div><div class="post-name" style="cursor:pointer;" onclick="openFriendProfile('mary-jane')">Mary Jane <span class="post-meta">30 min ago</span></div>
           <div class="post-meta">visited and reviewed Queens Park in Toronto, Canada.</div></div>
         </div>
         <div class="post-text">A vibrant Saturday afternoon spent here with kids playing around and musicians performing to the public.</div>
@@ -923,8 +948,8 @@
 
       <div class="post-card">
         <div class="post-head">
-          <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/54.jpg');"></div>
-          <div><div class="post-name">Jared <span class="post-meta">5 hours ago</span></div></div>
+          <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/54.jpg');cursor:pointer;" onclick="openFriendProfile('jared')"></div>
+          <div><div class="post-name" style="cursor:pointer;" onclick="openFriendProfile('jared')">Jared <span class="post-meta">5 hours ago</span></div></div>
         </div>
         <div class="post-text">Is anyone interested in heading to the AGO on Monday together?</div>
         <div class="post-actions"><span class="like-btn" onclick="toggleLike(this)">♡</span><span class="interest-btn" onclick="openInterestConfirm(this,'Jared')"><svg viewBox="0 0 24 24"><path d="M4 12.5V8a1.5 1.5 0 013 0v3M7 11V5.5a1.5 1.5 0 013 0V11m0-.5V4.5a1.5 1.5 0 013 0V11m0 .5V6.5a1.5 1.5 0 013 0v8c0 3-2 6-6 6h-1c-3 0-4.5-1.5-6-4l-2-4a1.6 1.6 0 012.7-1.7L7 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
@@ -932,8 +957,8 @@
 
       <div class="post-card">
         <div class="post-head">
-          <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/32.jpg');"></div>
-          <div><div class="post-name">Alex completed the <b>Top 10 places to visit in Berlin</b> Quest! <span class="post-meta">18 hours ago</span></div></div>
+          <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/32.jpg');cursor:pointer;" onclick="openFriendProfile('alex')"></div>
+          <div><div class="post-name" style="cursor:pointer;" onclick="openFriendProfile('alex')">Alex completed the <b>Top 10 places to visit in Berlin</b> Quest! <span class="post-meta">18 hours ago</span></div></div>
         </div>
         <div class="photo cat-city" style="height:80px;"></div>
         <div class="post-actions"><span class="like-btn" onclick="toggleLike(this)">♡</span></div>
@@ -952,8 +977,8 @@
     <div class="content">
       <div class="topbar"><span class="backbtn" onclick="back()">‹</span><div style="font-weight:700;">Mary's Post</div><span></span></div>
       <div class="post-head">
-        <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/65.jpg');cursor:pointer;" onclick="go('screen-profile-friend')"></div>
-        <div><div class="post-name" style="cursor:pointer;" onclick="go('screen-profile-friend')">Mary Jane <span class="post-meta">30 min ago</span></div>
+        <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/65.jpg');cursor:pointer;" onclick="openFriendProfile('mary-jane')"></div>
+        <div><div class="post-name" style="cursor:pointer;" onclick="openFriendProfile('mary-jane')">Mary Jane <span class="post-meta">30 min ago</span></div>
         <div class="post-meta">visited and reviewed Queens Park in Toronto, Canada.</div>
         <div style="margin-top:4px;"><span class="tag-mini">Free Entry</span><span class="tag-mini">Running trails</span></div></div>
       </div>
@@ -980,10 +1005,10 @@
       </div>
       <div class="searchbar"><span>🔍</span><input placeholder="Search Username"></div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:8px;">You have 4 out of 50 friends that you can have on Nook.</div>
-      <div class="friend-row"><div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/32.jpg');"></div><div class="info"><div class="name">Alex Smith</div><div class="handle">@alexonthego</div><div class="meta">🤝 Friends since 2026 · ⭐ 5 Quests completed together</div></div></div>
-      <div class="friend-row"><div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/54.jpg');"></div><div class="info"><div class="name">Jared</div><div class="handle">@jumpingjared</div><div class="meta">🤝 Friends since 2026 · ⭐ Quests completed together</div></div></div>
+      <div class="friend-row" onclick="openFriendProfile('alex')" style="cursor:pointer;"><div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/32.jpg');"></div><div class="info"><div class="name">Alex Smith</div><div class="handle">@alexonthego</div><div class="meta">🤝 Friends since 2026 · ⭐ 5 Quests completed together</div></div></div>
+      <div class="friend-row" onclick="openFriendProfile('jared')" style="cursor:pointer;"><div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/54.jpg');"></div><div class="info"><div class="name">Jared</div><div class="handle">@jumpingjared</div><div class="meta">🤝 Friends since 2026 · ⭐ Quests completed together</div></div></div>
       <div class="friend-row"><div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/65.jpg');"></div><div class="info"><div class="name">Mary Jane</div><div class="handle">@iammary</div><div class="meta">🤝 Friends since 2026 · ⭐ 2 Quests completed together</div></div></div>
-      <div class="friend-row"><div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/12.jpg');"></div><div class="info"><div class="name">Kacey K.</div><div class="handle">@kaceythekat</div><div class="meta">⭐ 1 Quest completed together</div></div></div>
+      <div class="friend-row" onclick="openFriendProfile('kacey')" style="cursor:pointer;"><div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/12.jpg');"></div><div class="info"><div class="name">Kacey K.</div><div class="handle">@kaceythekat</div><div class="meta">⭐ 1 Quest completed together</div></div></div>
     </div>
     <div class="bottomnav">
       <div class="navitem" onclick="go('screen-map')"><span class="navicon">📍</span><span class="navlabel">Map</span></div>
@@ -1005,12 +1030,12 @@
       <div class="friend-row">
         <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/21.jpg');"></div>
         <div class="info"><div class="name">Joanne V</div><div class="handle">@joannethegar</div></div>
-        <div class="btn-sm-reject" onclick="this.closest('.friend-row').remove()">Reject</div><div class="btn-sm-accept" onclick="this.closest('.friend-row').remove()">Accept</div>
+        <div class="btn-sm-reject" onclick="handleFriendRequest(this,false)">Reject</div><div class="btn-sm-accept" onclick="handleFriendRequest(this,true)">Accept</div>
       </div>
       <div class="friend-row">
         <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/women/47.jpg');"></div>
         <div class="info"><div class="name">Pamela T</div><div class="handle">@pamela_tay</div></div>
-        <div class="btn-sm-reject" onclick="this.closest('.friend-row').remove()">Reject</div><div class="btn-sm-accept" onclick="this.closest('.friend-row').remove()">Accept</div>
+        <div class="btn-sm-reject" onclick="handleFriendRequest(this,false)">Reject</div><div class="btn-sm-accept" onclick="handleFriendRequest(this,true)">Accept</div>
       </div>
     </div>
     <div class="bottomnav">
@@ -1028,7 +1053,7 @@
       <div class="searchbar"><span>🔍</span><input placeholder="Search Friend"></div>
       <div class="chat-row" onclick="go('screen-chat-detail')">
         <div class="avatar" style="background-image:url('https://randomuser.me/api/portraits/men/32.jpg');"></div>
-        <div style="flex:1;"><div class="name">Alex Smith</div><div class="preview">Here is the quest I've been doing in Berlin, it is pretty good if you want to have the...</div></div>
+        <div style="flex:1;" onclick="event.stopPropagation();openFriendProfile('alex')"><div class="name" style="cursor:pointer;">Alex Smith</div><div class="preview">Here is the quest I've been doing in Berlin, it is pretty good if you want to have the...</div></div>
         <div style="font-size:10px;color:var(--sub);">1d ago</div>
       </div>
     </div>
@@ -1043,7 +1068,7 @@
   <!-- chat detail -->
   <div class="screen" id="screen-chat-detail">
     <div class="content">
-      <div class="topbar"><span class="backbtn" onclick="back()">‹</span><div style="font-weight:800;font-size:15px;">Alex Smith</div><span></span></div>
+      <div class="topbar"><span class="backbtn" onclick="back()">‹</span><div style="font-weight:800;font-size:15px;cursor:pointer;" onclick="openFriendProfile('alex')">Alex Smith</div><span></span></div>
       <div style="text-align:center;font-size:11px;color:var(--sub);margin-bottom:10px;">Yesterday</div>
       <div class="chat-sender">Me</div>
       <div class="chat-bubble-me">How's the Berlin trip going? You mentioned you were doing a quest?</div>
@@ -1090,7 +1115,7 @@
         <div class="tab active">Lists</div>
         <div class="tab" onclick="go('screen-profile-badges')">Badges</div>
         <div class="tab" onclick="go('screen-profile-posts')">Posts</div>
-        <div class="tab" onclick="go('screen-profile-likes')">Likes</div>
+        <div class="tab" onclick="go('screen-profile-likes')">Reviews</div>
       </div>
       <div class="field-label">Status Lists</div>
       <div class="list-row" onclick="go('screen-view-list-empty')">
@@ -1101,11 +1126,15 @@
         <div class="list-thumb cat-city"></div>
         <div><div class="list-name">Been To</div><div class="list-count">15 places</div></div>
       </div>
+      <div class="list-row">
+        <div class="list-thumb cat-cafe"></div>
+        <div><div class="list-name">Favourites</div><div class="list-count">6 places</div></div>
+      </div>
       <div class="field-label">Custom Lists</div>
       <div id="custom-lists-container">
         <div class="list-row" onclick="go('screen-view-list-libraries')">
           <div class="list-thumb cat-library"></div>
-          <div><div class="list-name">Awesome Libraries</div><div class="list-count">18 places</div></div>
+          <div><div class="list-name">Awesome Libraries</div><div class="list-count" id="profile-awesome-libraries-count">1 place</div></div>
         </div>
       </div>
       <div class="pill-btn" style="margin-top:6px;" onclick="go('screen-create-list')">+ Add a list</div>
@@ -1137,18 +1166,18 @@
         <div class="tab" onclick="go('screen-profile')">Lists</div>
         <div class="tab active">Badges</div>
         <div class="tab" onclick="go('screen-profile-posts')">Posts</div>
-        <div class="tab" onclick="go('screen-profile-likes')">Likes</div>
+        <div class="tab" onclick="go('screen-profile-likes')">Reviews</div>
       </div>
       <div class="field-label">Achievements</div>
       <div class="badge-grid">
-        <div class="badge" style="background:#DCEBF7;">🌍</div>
-        <div class="badge" style="background:#E3DCF7;">🌙</div>
-        <div class="badge" style="background:#E8EFD9;">⛰️</div>
-        <div class="badge" style="background:#F0E3F7;">🎯</div>
-        <div class="badge" style="background:#F7E3E3;">🎖️</div>
-        <div class="badge" style="background:#F7EAD3;">🏆</div>
-        <div class="badge" style="background:#FBE3D3;">🔥</div>
-        <div class="badge" style="background:#F7ECC7;">✅</div>
+        <div class="badge-item"><div class="badge" style="background:#DCEBF7;">🌍</div><div class="badge-name">Globetrotter</div></div>
+        <div class="badge-item"><div class="badge" style="background:#E3DCF7;">🌙</div><div class="badge-name">Night Owl</div></div>
+        <div class="badge-item"><div class="badge" style="background:#E8EFD9;">⛰️</div><div class="badge-name">Trailblazer</div></div>
+        <div class="badge-item"><div class="badge" style="background:#F0E3F7;">🎯</div><div class="badge-name">Quest Master</div></div>
+        <div class="badge-item"><div class="badge" style="background:#F7E3E3;">🎖️</div><div class="badge-name">Studious</div></div>
+        <div class="badge-item"><div class="badge" style="background:#F7EAD3;">🏆</div><div class="badge-name">Champion</div></div>
+        <div class="badge-item"><div class="badge" style="background:#FBE3D3;">🔥</div><div class="badge-name">On a Streak</div></div>
+        <div class="badge-item"><div class="badge" style="background:#F7ECC7;">✅</div><div class="badge-name">First Quest</div></div>
       </div>
     </div>
     <div class="bottomnav">
@@ -1176,7 +1205,7 @@
         <div class="tab" onclick="go('screen-profile')">Lists</div>
         <div class="tab" onclick="go('screen-profile-badges')">Badges</div>
         <div class="tab active">Posts</div>
-        <div class="tab" onclick="go('screen-profile-likes')">Likes</div>
+        <div class="tab" onclick="go('screen-profile-likes')">Reviews</div>
       </div>
 
       <div class="post-card" onclick="go('screen-social-post')">
@@ -1225,10 +1254,10 @@
         <div class="tab" onclick="go('screen-profile')">Lists</div>
         <div class="tab" onclick="go('screen-profile-badges')">Badges</div>
         <div class="tab" onclick="go('screen-profile-posts')">Posts</div>
-        <div class="tab active">Likes</div>
+        <div class="tab active">Reviews</div>
       </div>
 
-      <div class="place-mini" onclick="go('screen-location')"><div class="thumb cat-building"></div><div class="info"><div class="name">Bahen Centre for Information Technology</div><div class="desc">40 St George St</div></div></div>
+      <div class="place-mini" onclick="openLocationScreen('bahen')"><div class="thumb cat-building"></div><div class="info"><div class="name">Bahen Centre for Information Technology</div><div class="desc">40 St George St</div></div></div>
       <div class="place-mini"><div class="thumb cat-park"></div><div class="info"><div class="name">Queens Park</div><div class="desc">111 Wellesley St W</div></div></div>
       <div class="place-mini"><div class="thumb cat-cafe"></div><div class="info"><div class="name">Pokemon Cafe</div><div class="desc">Description:</div></div></div>
     </div>
@@ -1245,16 +1274,16 @@
     <div class="content">
       <div class="topbar"><span class="backbtn" onclick="back()">‹</span><span class="kebab">⋯</span></div>
       <div class="profile-head">
-        <div class="avatar-big" style="background-image:url('https://randomuser.me/api/portraits/women/65.jpg');"></div>
-        <div><div class="profile-name">Mary Jane</div><div class="profile-handle">@merryjaney</div><div class="profile-bio">I love cheese very much</div></div>
+        <div class="avatar-big" id="friend-avatar" style="background-image:url('https://randomuser.me/api/portraits/women/65.jpg');"></div>
+        <div><div class="profile-name" id="friend-name">Mary Jane</div><div class="profile-handle" id="friend-handle">@merryjaney</div><div class="profile-bio" id="friend-bio">I love cheese very much</div></div>
       </div>
       <div class="stat-row">
-        <div class="stat"><div class="num">32</div><div class="lbl">friends</div></div>
-        <div class="stat"><div class="num">15</div><div class="lbl">badges</div></div>
+        <div class="stat"><div class="num" id="friend-friends-count">32</div><div class="lbl">friends</div></div>
+        <div class="stat"><div class="num" id="friend-badges-count">15</div><div class="lbl">badges</div></div>
       </div>
-      <div class="match-row"><div class="match-pill">50% Match</div><div class="match-pill">5 visits together</div></div>
+      <div class="match-row"><div class="match-pill" id="friend-match-pct">50% Match</div></div>
       <div class="tabs-row">
-        <div class="tab active">Lists</div><div class="tab">Badges</div><div class="tab">Posts</div><div class="tab">Likes</div>
+        <div class="tab active">Lists</div><div class="tab">Badges</div><div class="tab">Posts</div><div class="tab">Reviews</div>
       </div>
       <div class="field-label">Status Lists</div>
       <div class="list-row"><div class="list-thumb cat-city"></div><div><div class="list-name">Want to Go</div><div class="list-count">50 places 🔒</div></div></div>
@@ -1291,10 +1320,10 @@
   <!-- empty list (Want to Go) -->
   <div class="screen" id="screen-view-list-empty">
     <div class="content">
-      <div class="topbar"><span class="backbtn" onclick="back()">‹</span><span class="kebab">⋯</span></div>
+      <div class="topbar"><span class="backbtn" onclick="back()">‹</span><span class="kebab" onclick="openListOptionsMenu('Want to Go')">⋯</span></div>
       <h1 class="pagetitle">Want to Go</h1>
       <div style="display:flex;gap:8px;align-items:center;margin:6px 0 12px;font-size:12px;color:var(--sub);">
-        <span id="want-to-go-count">0 places</span><div class="match-pill">🌐 Public</div>
+        <span id="want-to-go-count">0 places</span><div class="match-pill" id="want-to-go-visibility">🌐 Public</div>
       </div>
       <div class="pill-btn" style="margin-bottom:14px;display:inline-block;" onclick="openAddPlaceModal('want-to-go')">+ Add a place</div>
       <div class="searchbar"><span style="font-size:13px;color:var(--sub);">Filter ▾</span><input placeholder="Search"><span>🔍</span></div>
@@ -1307,10 +1336,10 @@
   <!-- Awesome Libraries list -->
   <div class="screen" id="screen-view-list-libraries">
     <div class="content">
-      <div class="topbar"><span class="backbtn" onclick="back()">‹</span><span class="kebab">⋯</span></div>
+      <div class="topbar"><span class="backbtn" onclick="back()">‹</span><span class="kebab" onclick="openListOptionsMenu('Awesome Libraries')">⋯</span></div>
       <h1 class="pagetitle">Awesome Libraries</h1>
       <div style="display:flex;gap:8px;align-items:center;margin:6px 0 12px;font-size:12px;color:var(--sub);">
-        <span id="awesome-libraries-count">1 places</span><div class="match-pill">🌐 Public</div>
+        <span id="awesome-libraries-count">1 place</span><div class="match-pill" id="awesome-libraries-visibility">🌐 Public</div>
       </div>
       <div class="pill-btn" style="margin-bottom:14px;display:inline-block;" onclick="openAddPlaceModal('awesome-libraries')">+ Add a place</div>
       <div class="searchbar"><span style="font-size:13px;color:var(--sub);">Filter ▾</span><input placeholder="Search"><span>🔍</span></div>
@@ -1318,7 +1347,7 @@
         <div class="place-mini">
           <div class="thumb cat-library"></div>
           <div class="info"><div class="name">E.J. Pratt Library</div><div class="dist">71 Queen's Park Cres E</div></div>
-          <span class="kebab">⋯</span>
+          <span class="kebab" onclick="openPlaceOptionsMenu('E.J. Pratt Library')">⋯</span>
         </div>
       </div>
     </div>
@@ -1403,6 +1432,13 @@
         <div class="pill-btn" onclick="go('screen-create-quest-step1')"><span style="font-weight:900;margin-right:3px;">+</span>Create new quest</div>
       </div>
 
+      <div class="quest-tutorial-card" id="quest-tutorial-card">
+        <div class="quest-tutorial-close" onclick="document.getElementById('quest-tutorial-card').remove()">✕</div>
+        <div class="quest-tutorial-icon">🎯</div>
+        <div class="quest-tutorial-title">New to Quests?</div>
+        <div class="quest-tutorial-text">Turn any list into a quest, then check off each place as you visit — right from the map. Complete every place to earn a badge and share it with friends!</div>
+      </div>
+
       <div style="font-weight:800;font-size:14px;">Your Quests</div>
       <div class="quest-card" onclick="openQuestDetail('pokemon-cafe')">
         <div style="font-size:16px;">🔖</div>
@@ -1420,7 +1456,7 @@
           <div class="quest-title">Weekend Study</div>
           <div class="quest-places">10 places</div>
         </div>
-        <div class="progress-circle" style="--p:60;"><span>60%</span></div>
+        <div class="progress-circle" style="--p:70;"><span>70%</span></div>
       </div>
       <div class="quest-card" onclick="openQuestDetail('physical-exercising')">
         <div style="font-size:16px;">🔖</div>
@@ -1473,7 +1509,7 @@
         </div>
         <div class="choice-card" onclick="selectChoiceCard(this)">
           <div class="icon">📚</div>
-          <div class="txt">Awesome Libraries<br>18 places</div>
+          <div class="txt">Awesome Libraries<br>1 place</div>
           <div class="dot"></div>
         </div>
       </div>
@@ -1527,11 +1563,6 @@
       <div class="topbar"><span class="backbtn" onclick="back()">‹</span><span></span></div>
       <div class="searchbar" style="margin-bottom:14px;">
         <span>🔍</span><input id="quest-search-input" placeholder="Search for a place...">
-      </div>
-
-      <div style="font-size:12px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Recent Searches</div>
-      <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;">
-        <div style="min-width:100px;" onclick="document.getElementById('quest-search-input').value='Squirtle Cafe';"><div class="thumb cat-cafe" style="width:100px;height:70px;border-radius:10px;"></div><div style="font-size:11px;font-weight:700;margin-top:4px;">Squirtle Cafe</div></div>
       </div>
 
       <div class="place-mini" id="quest-search-result" style="align-items:center;">
@@ -1615,11 +1646,10 @@
     <div class="sheet-card">
       <div class="sheet-handle"></div>
       <div class="sheet-title">Filters</div>
-      <div class="scope-dropdown">
-        <div class="scope-dropdown-btn" onclick="toggleScopeDropdown()">
-          <span id="scope-selected-label">All Spaces</span><span class="chev" id="scope-chev">⌄</span>
-        </div>
-        <div class="scope-dropdown-menu" id="scope-dropdown-menu">
+      <div class="type-row" style="position:relative;">
+        <div class="lbl">Scope:</div>
+        <div class="type-select" onclick="toggleScopeDropdown()"><span id="scope-selected-label">All Spaces</span> <span class="chev" id="scope-chev">▾</span></div>
+        <div class="scope-dropdown-menu" id="scope-dropdown-menu" style="top:calc(100% + 4px);right:auto;left:124px;width:160px;">
           <div onclick="selectScope('All Spaces')">All Spaces</div>
           <div onclick="selectScope('My Spaces')">My Spaces</div>
           <div onclick="selectScope('Friends Only')">Friends Only</div>
@@ -1628,7 +1658,7 @@
       <div class="type-row" style="position:relative;">
         <div class="lbl">Type of Place:</div>
         <div class="type-select" onclick="toggleTypeDropdown()"><span id="type-selected-label">Select</span> <span id="type-chev">▾</span></div>
-        <div class="scope-dropdown-menu" id="type-dropdown-menu" style="top:calc(100% + 4px);right:0;left:auto;width:180px;">
+        <div class="scope-dropdown-menu" id="type-dropdown-menu" style="top:calc(100% + 4px);right:auto;left:124px;width:180px;">
           <div onclick="selectType('Food/Drink')">Food/Drink</div>
           <div onclick="selectType('Study/Work')">Study/Work</div>
           <div onclick="selectType('Physical Activity')">Physical Activity</div>
@@ -1641,13 +1671,13 @@
       <div class="filter-section">
         <div class="filter-row" onclick="toggleFilterRow(this)">Distance from Current Location <span class="chev">⌄</span></div>
         <div class="filter-body">
-          <div class="cost-track" id="dist-track"><div class="cost-handle" id="dist-handle-single" style="left:40%;">•</div></div>
+          <div class="cost-track" id="dist-track"><div class="cost-track-fill" id="dist-track-fill" style="left:0%;width:40%;"></div><div class="cost-handle" id="dist-handle-single" style="left:40%;">•</div></div>
           <div class="cost-labels"><span>0km</span><span>5km</span><span>10km+</span></div>
         </div>
 
         <div class="filter-row open" onclick="toggleFilterRow(this)">Cost <span class="chev">⌃</span></div>
         <div class="filter-body open">
-          <div class="cost-track" id="cost-track-el"><div class="cost-handle" id="cost-handle-min" style="left:0%;">min</div><div class="cost-handle" id="cost-handle-max" style="left:100%;">max</div></div>
+          <div class="cost-track" id="cost-track-el"><div class="cost-track-fill" id="cost-track-fill" style="left:0%;width:100%;"></div><div class="cost-handle" id="cost-handle-min" style="left:0%;">min</div><div class="cost-handle" id="cost-handle-max" style="left:100%;">max</div></div>
           <div class="cost-labels"><span>Free</span><span>$</span><span>$$</span><span>$$$</span></div>
         </div>
 
@@ -1682,6 +1712,36 @@
   </div>
 
   <!-- add to list: choose which list to save a place into -->
+  <!-- place options menu (opened via the ⋯ next to a saved place) -->
+  <div class="sheet-overlay" id="screen-place-options-menu">
+    <div class="sheet-card">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" style="font-size:18px;" id="place-options-menu-title">Place options</div>
+      <div class="pill-btn" style="display:block;text-align:center;margin-bottom:10px;" onclick="goToReviewForPlace()">✎ Add Review</div>
+      <div class="btn-outline" onclick="closeSheet('screen-place-options-menu')">Cancel</div>
+    </div>
+  </div>
+
+  <!-- list options menu (top-bar ⋯ on a list screen): edit list + public/private toggle -->
+  <div class="sheet-overlay" id="screen-list-options-menu">
+    <div class="sheet-card">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" style="font-size:18px;" id="list-options-menu-title">List options</div>
+
+      <div class="pill-btn" style="display:block;text-align:center;margin-bottom:14px;" onclick="editCurrentList()">✎ Edit List</div>
+
+      <div class="toggle-row" style="margin:0 0 18px;">
+        <div>
+          <div style="font-weight:800;font-size:14px;color:var(--ink);">Public List</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:2px;">Anyone can see this list</div>
+        </div>
+        <div class="toggle on" id="list-visibility-toggle" onclick="toggleListVisibility(this)"><div class="knob"></div></div>
+      </div>
+
+      <div class="btn-outline" onclick="closeSheet('screen-list-options-menu')">Done</div>
+    </div>
+  </div>
+
   <div class="sheet-overlay" id="screen-add-to-list">
     <div class="sheet-card">
       <div class="sheet-handle"></div>
@@ -1700,7 +1760,7 @@
       </div>
       <div class="list-row add-to-list-option" onclick="selectAddToListOption(this,'Awesome Libraries')" style="padding:10px 6px;border:2px solid transparent;border-radius:12px;cursor:pointer;">
         <div class="list-thumb cat-library"></div>
-        <div><div class="list-name">Awesome Libraries</div><div class="list-count">18 places</div></div>
+        <div><div class="list-name">Awesome Libraries</div><div class="list-count" id="addtolist-awesome-libraries-count">1 place</div></div>
         <div class="dot" style="margin-left:auto;"></div>
       </div>
 
@@ -1770,14 +1830,14 @@
         </div>
         <div class="progress-circle" style="--p:80;"><span>80%</span></div>
       </div>
-      <div class="quest-card" onclick="selectQuestOption(this,'Weekend Study', 10, 6)">
+      <div class="quest-card" onclick="selectQuestOption(this,'Weekend Study', 10, 7)">
         <div style="font-size:16px;">🔖</div>
         <div class="qinfo">
           <div class="quest-owner">Jackson's Quest</div>
           <div class="quest-title">Weekend Study</div>
           <div class="quest-places">10 places</div>
         </div>
-        <div class="progress-circle" style="--p:60;"><span>60%</span></div>
+        <div class="progress-circle" style="--p:70;"><span>70%</span></div>
       </div>
       <div class="quest-card" onclick="selectQuestOption(this,'Physical Exercising', 10, 1)">
         <div style="font-size:16px;">🔖</div>
@@ -1855,7 +1915,7 @@
   window.addEventListener('load', initNookMap);
 
   function go(id){
-    const overlays = ['screen-confirm-interested','screen-quest-completed','screen-filters','screen-begin-quest-picker','screen-checkin','screen-add-to-list','screen-notify-network','screen-badge-earned','screen-confirm-add-place'];
+    const overlays = ['screen-confirm-interested','screen-quest-completed','screen-filters','screen-begin-quest-picker','screen-checkin','screen-add-to-list','screen-notify-network','screen-badge-earned','screen-confirm-add-place','screen-place-options-menu','screen-list-options-menu'];
     const fullmodals = ['screen-find-place'];
 
     if(overlays.includes(id)){
@@ -1930,7 +1990,16 @@
     const track = document.getElementById(trackId);
     const minH = document.getElementById(minId);
     const maxH = document.getElementById(maxId);
+    const fill = track ? track.querySelector('.cost-track-fill') : null;
     if(!track || !minH || !maxH) return;
+
+    function updateFill(){
+      if(!fill) return;
+      const minPct = parseFloat(minH.style.left);
+      const maxPct = parseFloat(maxH.style.left);
+      fill.style.left = minPct + '%';
+      fill.style.width = (maxPct - minPct) + '%';
+    }
 
     function bind(handle, isMin){
       handle.addEventListener('pointerdown', function(e){
@@ -1950,6 +2019,7 @@
             pct = Math.max(pct, minPct);
           }
           handle.style.left = pct + '%';
+          updateFill();
         }
         function onUp(){
           handle.style.cursor = 'grab';
@@ -1962,12 +2032,21 @@
     }
     bind(minH, true);
     bind(maxH, false);
+    updateFill();
   }
 
   function initSingleSlider(trackId, handleId){
     const track = document.getElementById(trackId);
     const handle = document.getElementById(handleId);
+    const fill = track ? track.querySelector('.cost-track-fill') : null;
     if(!track || !handle) return;
+
+    function updateFill(){
+      if(!fill) return;
+      fill.style.left = '0%';
+      fill.style.width = handle.style.left;
+    }
+
     handle.addEventListener('pointerdown', function(e){
       e.preventDefault();
       handle.setPointerCapture(e.pointerId);
@@ -1977,6 +2056,7 @@
         let pct = ((ev.clientX - rect.left) / rect.width) * 100;
         pct = Math.max(0, Math.min(100, pct));
         handle.style.left = pct + '%';
+        updateFill();
       }
       function onUp(){
         handle.style.cursor = 'grab';
@@ -1986,6 +2066,7 @@
       document.addEventListener('pointermove', onMove);
       document.addEventListener('pointerup', onUp);
     });
+    updateFill();
   }
   document.addEventListener('DOMContentLoaded', function(){
     initSingleSlider('dist-track', 'dist-handle-single');
@@ -2027,6 +2108,52 @@
   let addPlaceTargetList = null;
   let pendingSearchedPlace = null;
 
+  let pendingPlaceOptionsName = '';
+  let currentListName = '';
+  function openListOptionsMenu(listName){
+    currentListName = listName;
+    document.getElementById('list-options-menu-title').textContent = listName;
+    // reflect current visibility state of that list in the toggle
+    const visId = listName === 'Want to Go' ? 'want-to-go-visibility' : 'awesome-libraries-visibility';
+    const visEl = document.getElementById(visId);
+    const toggle = document.getElementById('list-visibility-toggle');
+    const isPublic = visEl && visEl.textContent.includes('Public');
+    toggle.classList.toggle('on', isPublic);
+    go('screen-list-options-menu');
+  }
+
+  function toggleListVisibility(toggleEl){
+    toggleEl.classList.toggle('on');
+    const isPublic = toggleEl.classList.contains('on');
+    const visId = currentListName === 'Want to Go' ? 'want-to-go-visibility' : 'awesome-libraries-visibility';
+    const visEl = document.getElementById(visId);
+    if(visEl){
+      visEl.innerHTML = isPublic ? '🌐 Public' : '🔒 Private';
+    }
+  }
+
+  function editCurrentList(){
+    closeSheet('screen-list-options-menu');
+    const nameInput = document.getElementById('new-list-name-input');
+    if(nameInput) nameInput.value = currentListName;
+    go('screen-create-list');
+  }
+
+  function openPlaceOptionsMenu(placeName){
+    pendingPlaceOptionsName = placeName;
+    document.getElementById('place-options-menu-title').textContent = placeName;
+    go('screen-place-options-menu');
+  }
+
+  function goToReviewForPlace(){
+    closeSheet('screen-place-options-menu');
+    document.getElementById('review-place-name').value = pendingPlaceOptionsName;
+    document.querySelectorAll('.rating-face').forEach(f=>f.classList.remove('selected'));
+    document.getElementById('review-notes-input').value = '';
+    document.getElementById('review-tags-chips').innerHTML = '';
+    go('screen-write-review');
+  }
+
   function openAddPlaceModal(targetList){
     addPlaceTargetList = targetList;
     go('screen-find-place');
@@ -2051,12 +2178,24 @@
 
     const row = document.createElement('div');
     row.className = 'place-mini';
-    row.innerHTML = '<div class="thumb ' + pendingSearchedPlace.cat + '"></div><div class="info"><div class="name">' + pendingSearchedPlace.name + '</div><div class="dist">' + pendingSearchedPlace.address + '</div></div><span class="kebab">⋯</span>';
+    const safeName = pendingSearchedPlace.name.replace(/'/g, "\\'");
+    row.innerHTML = '<div class="thumb ' + pendingSearchedPlace.cat + '"></div><div class="info"><div class="name">' + pendingSearchedPlace.name + '</div><div class="dist">' + pendingSearchedPlace.address + '</div></div><span class="kebab" onclick="openPlaceOptionsMenu(\'' + safeName + '\')">⋯</span>';
     container.appendChild(row);
 
-    const countEl = document.getElementById(countId);
     const currentCount = container.querySelectorAll('.place-mini').length;
-    countEl.textContent = currentCount + ' places';
+    const countLabel = currentCount + (currentCount === 1 ? ' place' : ' places');
+    document.getElementById(countId).textContent = countLabel;
+
+    // keep every other place this count shows up in sync too
+    if(addPlaceTargetList === 'awesome-libraries'){
+      const profileCount = document.getElementById('profile-awesome-libraries-count');
+      if(profileCount) profileCount.textContent = countLabel;
+      const addToListCount = document.getElementById('addtolist-awesome-libraries-count');
+      if(addToListCount) addToListCount.textContent = countLabel;
+      document.querySelectorAll('#quest-list-choices .choice-card .txt').forEach(t=>{
+        if(t.textContent.includes('Awesome Libraries')) t.innerHTML = 'Awesome Libraries<br>' + countLabel;
+      });
+    }
 
     closeOverlay('screen-confirm-add-place');
     back(); // close the find-place modal, returning to the list screen
@@ -2165,19 +2304,19 @@
       ]
     },
     'weekend-study': {
-      owner: "Jackson's Quest", title: 'Weekend Study', pct: 60, total: 10, visited: 6,
+      owner: "Jackson's Quest", title: 'Weekend Study', pct: 70, total: 10, visited: 7,
       desc: 'The best quiet corners on campus for a solid weekend study session.',
       places: [
-        {name:'Gerstein Science Information Centre', status:'visited'},
         {name:'University College (Main Building)', status:'visited'},
-        {name:'John P. Robarts Research Library', status:'visited'},
         {name:'E.J. Pratt Library', status:'visited'},
         {name:'Bahen Centre for Information Technology', status:'visited'},
         {name:'Emmanuel College Library', status:'visited'},
-        {name:'Trinity College Library', status:'pending'},
-        {name:'Victoria College Library', status:'pending'},
-        {name:'Massey College Library', status:'pending'},
-        {name:'Innis College Library', status:'pending'}
+        {name:'Trinity College Library', status:'visited'},
+        {name:'Victoria College Library', status:'visited'},
+        {name:'Massey College Library', status:'visited'},
+        {name:'Robarts Library', status:'pending'},
+        {name:'Gerstein Science Information Centre', status:'pending'},
+        {name:'Student Commons', status:'pending'}
       ]
     },
     'physical-exercising': {
@@ -2335,6 +2474,56 @@
   }
 
   let pendingInterestBtn = null;
+  const FRIENDS_DATA = {
+    'mary-jane': {
+      name:'Mary Jane', handle:'@merryjaney', bio:'I love cheese very much',
+      avatar:'https://randomuser.me/api/portraits/women/65.jpg',
+      friends:32, badges:15, match:'50% Match', together:'5 visits together'
+    },
+    'jared': {
+      name:'Jared', handle:'@jumpingjared', bio:'Always down for a spontaneous trip',
+      avatar:'https://randomuser.me/api/portraits/men/54.jpg',
+      friends:41, badges:9, match:'38% Match', together:'0 Quests completed together'
+    },
+    'alex': {
+      name:'Alex Smith', handle:'@alexonthego', bio:'Chasing every quest I can find',
+      avatar:'https://randomuser.me/api/portraits/men/32.jpg',
+      friends:56, badges:22, match:'62% Match', together:'5 Quests completed together'
+    },
+    'kacey': {
+      name:'Kacey K.', handle:'@kaceythekat', bio:'Cafe hopper, cat lover',
+      avatar:'https://randomuser.me/api/portraits/women/12.jpg',
+      friends:19, badges:6, match:'44% Match', together:'1 Quest completed together'
+    }
+  };
+
+  function openFriendProfile(key){
+    const d = FRIENDS_DATA[key];
+    if(!d){ go('screen-profile-friend'); return; }
+    document.getElementById('friend-avatar').style.backgroundImage = "url('" + d.avatar + "')";
+    document.getElementById('friend-name').textContent = d.name;
+    document.getElementById('friend-handle').textContent = d.handle;
+    document.getElementById('friend-bio').textContent = d.bio;
+    document.getElementById('friend-friends-count').textContent = d.friends;
+    document.getElementById('friend-badges-count').textContent = d.badges;
+    document.getElementById('friend-match-pct').textContent = d.match;
+    go('screen-profile-friend');
+  }
+
+  function handleFriendRequest(btn, accepted){
+    const row = btn.closest('.friend-row');
+    if(!row || row.dataset.handled) return;
+    row.dataset.handled = 'true';
+    row.querySelectorAll('.btn-sm-reject, .btn-sm-accept').forEach(b => b.style.display = 'none');
+    const feedback = document.createElement('div');
+    feedback.style.fontWeight = '800';
+    feedback.style.fontSize = '12px';
+    feedback.style.color = accepted ? 'var(--olive-dark)' : 'var(--sub)';
+    feedback.textContent = accepted ? '✓ Accepted' : 'Declined';
+    row.appendChild(feedback);
+    setTimeout(()=>{ row.remove(); }, 900);
+  }
+
   function openInterestConfirm(el, name){
     pendingInterestBtn = el;
     document.querySelectorAll('.interest-target-name').forEach(s => s.textContent = name);
@@ -2370,6 +2559,8 @@
     if(wrap) wrap.classList.remove('quest-mode-active');
     const badge = document.getElementById('quest-mode-badge');
     if(badge) badge.style.display = 'none';
+    // leaving quest mode: pins always go back to their normal maroon colour
+    document.querySelectorAll('.pin.pin-pending-white').forEach(p => p.classList.remove('pin-pending-white'));
   }
 
   // ---- Begin a Quest: picker + live tracker ----
@@ -2403,6 +2594,8 @@
     updateTrackerDisplay();
     closeSheet('screen-begin-quest-picker');
     showQuestTracker('screen-map');
+    // entering quest mode: not-yet-visited places show as white/blank pins
+    document.querySelectorAll('.pin').forEach(p => p.classList.add('pin-pending-white'));
   }
 
   function updateTrackerDisplay(){
@@ -2413,11 +2606,71 @@
   }
 
   // ---- Pin tap: open check-in card if a quest is active, else go to full location info ----
-  function handlePinClick(name, address, photoKeyword){
+  const LOCATION_DATA = {
+    'bahen': {
+      name:'Bahen Centre for Information Technology', address:"40 St George St, Toronto, ON M5S 2E4",
+      category:'Academic Department', chips:['Study Spot','Accessibility'],
+      status:'OPEN', hoursLine:'Monday - Friday, Sunday · 8:30AM - 9PM',
+      cat:'cat-tech', mapsQuery:'Bahen Centre for Information Technology 40 St George St Toronto'
+    },
+    'university-college': {
+      name:'University College (Main Building)', address:"15 King's College Cir, Toronto, ON M5S 3H7",
+      category:'Academic Department', chips:['Historic','Accessibility'],
+      status:'CLOSED', hoursLine:'Closed — opens 9AM Tuesday',
+      cat:'cat-building', mapsQuery:"University College Main Building 15 King's College Cir Toronto"
+    },
+    'robarts': {
+      name:'John P. Robarts Research Library (Robarts Library)', address:'130 St George St, Toronto, ON M5S 0C2',
+      category:'Library', chips:['Study Spot','Accessibility'],
+      status:'OPEN', hoursLine:'Open Till 10PM',
+      cat:'cat-library', mapsQuery:'Robarts Library 130 St George St Toronto'
+    },
+    'pratt': {
+      name:'E.J. Pratt Library', address:"71 Queen's Park Cres E, Toronto, ON M5S 1K7",
+      category:'Library', chips:['Study Spot','Calm'],
+      status:'CLOSED', hoursLine:'Closed — opens 9AM Tuesday',
+      cat:'cat-library', mapsQuery:"E.J. Pratt Library 71 Queen's Park Cres E Toronto"
+    },
+    'gerstein': {
+      name:'Gerstein Science Information Centre', address:"9 King's College Cir, Toronto, ON M5S 3H5",
+      category:'Library', chips:['Study Spot','Accessibility'],
+      status:'OPEN', hoursLine:'Open Till 10PM',
+      cat:'cat-library', mapsQuery:"Gerstein Science Information Centre 9 King's College Cir Toronto"
+    },
+    'student-commons': {
+      name:'Student Commons', address:'230 College St, Toronto, ON M5T 1R2',
+      category:'Student Centre', chips:['Free','Accessibility'],
+      status:'OPEN', hoursLine:'Open Till 11PM',
+      cat:'cat-building', mapsQuery:'Student Commons 230 College St Toronto'
+    }
+  };
+
+  function openLocationScreen(key){
+    const d = LOCATION_DATA[key];
+    if(!d) { go('screen-location'); return; }
+    document.getElementById('loc-title-text').textContent = d.name;
+    document.getElementById('loc-address').textContent = d.address;
+    document.getElementById('loc-category').textContent = d.category;
+    document.getElementById('loc-chips').innerHTML = d.chips.map(c => '<div class="chip">' + c + '</div>').join('');
+    document.getElementById('loc-maps-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(d.mapsQuery);
+    const hoursBlock = document.getElementById('loc-hours-block');
+    if(d.status === 'OPEN'){
+      hoursBlock.innerHTML = '<div class="open-badge">OPEN</div><div class="today">' + d.hoursLine + '</div>';
+    } else {
+      hoursBlock.innerHTML = '<div class="closed" style="font-weight:800;">CLOSED</div><div>' + d.hoursLine + '</div>';
+    }
+    const photoGrid = document.getElementById('loc-photo-grid');
+    photoGrid.querySelectorAll('.photo').forEach(p => {
+      p.className = 'photo ' + d.cat;
+    });
+    go('screen-location');
+  }
+
+  function handlePinClick(name, address, photoKeyword, locationKey){
     if(activeQuest){
       openCheckin(name, address, photoKeyword);
     } else {
-      go('screen-location');
+      openLocationScreen(locationKey);
     }
   }
 
@@ -2452,6 +2705,12 @@
     updateTrackerDisplay();
     updateCheckinTrackerDisplay();
     spawnConfetti();
+
+    // checked off: this pin turns back to its normal red/maroon colour
+    const checkedOffName = document.getElementById('checkin-name').textContent;
+    const matchingPin = document.querySelector('.pin[data-name="' + checkedOffName.replace(/"/g,'') + '"]');
+    if(matchingPin) matchingPin.classList.remove('pin-pending-white');
+
     const pin = document.getElementById('checkin-pin');
     pin.style.transition = 'transform .35s ease-in, opacity .35s ease-in';
     pin.style.transform = 'translate(0,-260px) scale(0.6) rotate(-20deg)';
@@ -2461,6 +2720,8 @@
       closeOverlay('screen-checkin');
       pin.style.transition = '';
       if(justCompleted){
+        // quest fully complete: make sure every pin is back to normal, just in case
+        document.querySelectorAll('.pin.pin-pending-white').forEach(p => p.classList.remove('pin-pending-white'));
         setTimeout(()=>{ openNotifyNetworkPrompt(completedQuestName); }, 350);
       }
     }, 700);
